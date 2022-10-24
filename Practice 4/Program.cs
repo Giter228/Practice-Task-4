@@ -1,7 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-
-namespace Practice_4
+﻿namespace Practice_4
 {
     internal class Program
     {
@@ -47,18 +44,14 @@ namespace Practice_4
             zam2.Name = "Сделать практическую по C# за неделю";
             zam2.Description = "Вот это вызов";
 
-            notes.Add(zam1);
-            notes.Add(zam2);
-
-            List<Notes> notes2 = new List<Notes>();
-
             Notes zam3 = new Notes();
-            zam3.Data = TodayData;
+            zam3.Data = DataTime;
             zam3.Name = "Выполнить дискретную математику";
             zam3.Description = "Законы алгебры логики";
 
-            notes2.Add(zam3);
-
+            notes.Add(zam1);
+            notes.Add(zam2);
+            notes.Add(zam3);
 
             Console.Write("  1. ");
             Console.WriteLine(zam1.Name);
@@ -112,7 +105,7 @@ namespace Practice_4
                 }
                 else if ((key.Key == ConsoleKey.Enter && position == 3 && DataTime == TodayData) || position == 4)
                 {
-                    Description(DataTime, TodayData, position, notes, notes2);
+                    Description(DataTime, TodayData, position, notes);
                     Console.Clear();
                     Console.WriteLine(DataStokToday);
                     Console.WriteLine($"  Выбрана дата: {DataTime.ToShortDateString()}");
@@ -124,21 +117,37 @@ namespace Practice_4
                 }
                 else if (key.Key == ConsoleKey.Enter && position == 3 && DataTime == TodayData.AddDays(1))
                 {
-                    Description(DataTime, TodayData, position, notes, notes2);
+                    Description(DataTime, TodayData, position, notes);
                     Console.Clear();
                     Console.WriteLine(DataStokToday);
                     Console.WriteLine($"  Выбрана дата: {DataTime.ToShortDateString()}");
                     Console.WriteLine("  ! Создать заметку.");
                     Console.Write("  1. ");
-                    Console.WriteLine(zam1.Name);
-                    Console.Write("  2. ");
-                    Console.WriteLine(zam2.Name);
+                    Console.WriteLine(zam3.Name);
                 }
                 else if (key.Key == ConsoleKey.Enter && position == 2)
                 {
-                    string NoteName = "";
-                    string NoteDescription = "";
-                    CreateNote(DataTime);
+                    notes = CreateNote(notes, DataTime);
+                    if (DataTime == TodayData)
+                    {
+                        var DaysNotes = notes.Where(x => x.Data == TodayData).ToList();
+
+                        Console.WriteLine(DataStokToday);
+                        Console.WriteLine($"  Выбрана дата: {DataTime.ToShortDateString()}");
+                        Console.WriteLine("  ! Создать заметку.");
+                        Console.Write("  1. ");
+                        Console.WriteLine(zam1.Name);
+                        Console.Write("  2. ");
+                        Console.WriteLine(zam2.Name);
+                        Console.Write("  3. " );
+                        Console.WriteLine(DaysNotes[position + 1].Name);
+
+
+                    }
+                }
+                else if (position == 5 && key.Key == ConsoleKey.Enter && DataTime == TodayData)
+                {
+                    Description(DataTime, TodayData, position, notes);
                 }
             }
         }
@@ -167,9 +176,9 @@ namespace Practice_4
             }
             else if (key.Key == ConsoleKey.DownArrow)
             {
-                if (position == 4)
+                if (position == 6)
                 {
-                    position = 4;
+                    position = 6;
                     last_position = position - 1;
                 }
 
@@ -200,10 +209,11 @@ namespace Practice_4
             Console.WriteLine(DataTime.ToShortDateString());
             return DataTime;
         }
-        static void Description(DateTime DataTime, DateTime TodayData, int position, List<Notes> notes, List<Notes> notes2)
+        static int Description(DateTime DataTime, DateTime TodayData, int position, List<Notes> notes)
         {
             Console.Clear();
-            if ((DataTime == TodayData && position == 3) || position == 4)
+            int a = 0;
+            if ((DataTime == TodayData && position == 3) || position == 4 || position == 5)
             {
                 var DaysNotes = notes.Where(x => x.Data == DataTime).ToList();
 
@@ -216,51 +226,57 @@ namespace Practice_4
                 Console.Write("Дата: ");
                 Console.WriteLine(DaysNotes[position - 3].Data);
                 Console.WriteLine("_________________________");
-
-                Console.WriteLine("Нажмите на \"Enter\", чтобы выйти.\nPress \"Enter\" to exit.");
-                int a = 0;
-                while (a != 1)
-                {
-                    ConsoleKeyInfo press = Console.ReadKey(true);
-
-                    if (press.Key != ConsoleKey.Enter)
-                    {
-                        Console.Write("");
-                    }
-                    else
-                    {
-                        a = 1;
-                    }
-                }
             }
-            if ((DataTime == TodayData.AddDays(1) && position == 3) || position == 4)
+            else if (DataTime == TodayData.AddDays(1) && position == 3)
             {
-                var DaysNotes2 = notes.Where(x => x.Data == DataTime).ToList();
+                var DaysNotes = notes.Where(x => x.Data.AddDays(1) == DataTime).ToList();
 
-                Console.SetCursorPosition(0, 0);
                 Console.Write(">>> ");
-                Console.WriteLine(DaysNotes2[position - 3].Name);
+                Console.WriteLine(DaysNotes[position - 1].Name);
                 Console.WriteLine("_________________________");
                 Console.Write("Описание: ");
-                Console.WriteLine(DaysNotes2[position - 3].Description);
+                Console.WriteLine(DaysNotes[position - 1].Description);
                 Console.Write("Дата: ");
-                Console.WriteLine(DaysNotes2[position - 3].Data);
+                Console.WriteLine(DaysNotes[position - 1].Data);
                 Console.WriteLine("_________________________");
             }
+
+            Console.WriteLine("Нажмите на \"Enter\", чтобы выйти.\nPress \"Enter\" to exit.");
+            while (a != 1)
+            {
+                ConsoleKeyInfo press = Console.ReadKey(true);
+
+                if (press.Key != ConsoleKey.Enter)
+                {
+                    Console.Write("");
+                }
+                else
+                {
+                    a = 1;
+                }
+            }
+            return a;
         }
-        static void CreateNote(DateTime DataTime)
+        static List<Notes> CreateNote(List<Notes> notes, DateTime DataTime)
         {
             Console.Clear();
             Console.CursorVisible = true;
-            bool access = false;
-            Notes newNote = new Notes();
+            /*bool access = false;*/
 
+            Notes newNote = new Notes();
             newNote.Data = DataTime;
 
             Console.WriteLine("Напишите название заметки: ");
             newNote.Name = Console.ReadLine();
             Console.WriteLine("Описание для заметки: ");
             newNote.Description = Console.ReadLine();
+
+            notes.Add(newNote);
+
+            Console.CursorVisible = true;
+
+            Console.Clear();
+            return notes;
         }
 
     }
